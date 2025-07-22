@@ -1,4 +1,4 @@
-import { registerUser } from "@/app/actions";
+import { registerUser } from "@/actions";
 
 export default function RegistrationForm() {
   return (

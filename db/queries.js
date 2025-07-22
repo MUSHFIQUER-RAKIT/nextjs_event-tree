@@ -4,6 +4,7 @@ import {
   replaceMongoIdInArray,
   replaceMongoIdInObject,
 } from "@/utils/data-utils";
+import mongoose from "mongoose";
 
 async function getAllEvents() {
   const events = await eventModel.find().lean();
@@ -29,4 +30,20 @@ async function findUserByCredentials(credentials) {
   return null;
 }
 
-export { createUser, findUserByCredentials, getAllEvents, getEventById };
+async function updateInterest(eventId, authId) {
+  const event = await eventModel.findById(eventId);
+
+  if (event) {
+    const foundUsers = event.interested_ids.find(
+      userId => userId.toString() === authId.toString()
+    );
+    if (foundUsers) {
+      event.interested_ids.pull(new mongoose.Types.ObjectId(authId));
+    }else {
+      event.interested_ids.push(new mongoose.Types.ObjectId(authId));
+    }
+    event.save();
+  }
+}
+
+export { createUser, findUserByCredentials, getAllEvents, getEventById , updateInterest };
