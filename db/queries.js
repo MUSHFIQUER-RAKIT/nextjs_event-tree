@@ -39,11 +39,25 @@ async function updateInterest(eventId, authId) {
     );
     if (foundUsers) {
       event.interested_ids.pull(new mongoose.Types.ObjectId(authId));
-    }else {
+    } else {
       event.interested_ids.push(new mongoose.Types.ObjectId(authId));
     }
     event.save();
   }
 }
 
-export { createUser, findUserByCredentials, getAllEvents, getEventById , updateInterest };
+async function updateGoing(eventId, authId) {
+  const event = await eventModel.findById(eventId);
+
+  event.going_ids.push(new mongoose.Types.ObjectId(authId));
+  event.save();
+}
+
+export {
+  createUser,
+  findUserByCredentials,
+  getAllEvents,
+  getEventById,
+  updateGoing,
+  updateInterest,
+};
