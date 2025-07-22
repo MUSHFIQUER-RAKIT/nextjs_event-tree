@@ -1,16 +1,26 @@
 "use client";
 
 import { loginUser } from "@/app/actions";
+import useAuth from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LoginForm() {
   const [formData, setformData] = useState();
   const [error, setError] = useState("");
+  const { setAuth } = useAuth();
+  const router = useRouter();
 
   async function onSubmit(e) {
     e.preventDefault();
     try {
-      await loginUser(new FormData(e.currentTarget));
+      const user = await loginUser(new FormData(e.currentTarget));
+      if (user) {
+        setAuth(user);
+        router.push("/");
+      } else {
+        setError("Invalid email or password");
+      }
     } catch (error) {
       setError(error.message);
       console.error("Login error:", error.message);
