@@ -1,12 +1,15 @@
 "use server";
 
+import EmailTemplate from "@/components/payment/EmailTemplate";
 import { revalidatePath } from "next/cache";
+import { Resend } from "resend";
 
 const {
   createUser,
   findUserByCredentials,
   updateInterest,
   updateGoing,
+  getEventById,
 } = require("@/db/queries");
 const { redirect } = require("next/navigation");
 
@@ -45,6 +48,7 @@ async function addInterestEvent(eventId, authId) {
 async function addGoingEvent(eventId, user) {
   try {
     await updateGoing(eventId, user?.id);
+    await sendEmail(eventId, user);
   } catch (error) {
     throw error;
   }
@@ -53,4 +57,23 @@ async function addGoingEvent(eventId, user) {
   redirect("/");
 }
 
-export { addInterestEvent, loginUser, registerUser , addGoingEvent };
+async function sendEmail(eventId, user) {
+  try {
+    const event = await getEventById(eventId);
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const message =
+      "You have successfully registered for the event: " + event?.name;
+
+    const send = await resend.emails.send({
+      from: "noreply.mushfiquer-rakit.io",
+      to: user?.email,
+      subject: "Event Registration Confirmation",
+      react: EmailTemplate({ message }),
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+
+export { addGoingEvent, addInterestEvent, loginUser, registerUser, sendEmail };
