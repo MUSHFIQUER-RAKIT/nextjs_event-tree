@@ -1,21 +1,27 @@
+import { getBlurData } from "@/utils/blur-genaretor";
 import Image from "next/image";
 import Link from "next/link";
 import ActionButtons from "../ActionButtons";
 import EventSchemaScript from "../meta/EventSchemaScript";
 
-export default function EventCard({ event }) {
+export default async function EventCard({ event }) {
+  const { base64 } = await getBlurData(event?.imageUrl);
   return (
     <div className="overflow-hidden rounded-md bg-[#242526]">
       <EventSchemaScript event={event} />
-      <Image
-        src={event?.imageUrl}
-        alt={event?.name}
-        className="w-full"
-        width={500}
-        height={500}
-      />
+      <div className="h-2/3">
+        <Image
+          src={event?.imageUrl}
+          alt={event?.name}
+          className="w-full object-fill h-full"
+          width={500}
+          height={500}
+          placeholder="blur"
+          blurDataURL={base64}
+        />
+      </div>
 
-      <div className="p-3">
+      <div className="h-1/3">
         <Link href={`/details/${event?.id}`} className="font-bold text-lg">
           {event?.name}
         </Link>
